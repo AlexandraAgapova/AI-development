@@ -16,11 +16,16 @@
    git clone https://github.com/AlexandraAgapova/AI-development.git
    cd AI-development/CV-1-41
    ```
-2. Установить зависимости:
+2. Создать виртуальное окружение:
    ```
-   pip install opencv-python numpy matplotlib
+   python -m venv venv
+   venv\Scripts\activate
    ```
-3. Запустить проект:
+3. Установить зависимости:
    ```
-   python main.py
+   pip install -r requirements.txt
+   ```
+4. Запустить проект:
+   ```
+   python compare_image_format.py
    ```
