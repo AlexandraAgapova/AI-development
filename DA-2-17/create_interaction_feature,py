@@ -1,0 +1,82 @@
+from sklearn.datasets import load_iris
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
+import numpy as np
+import pandas as pd
+
+def load_iris_data():
+    """Загружает данные Iris"""
+    try:
+        iris = load_iris()
+        df = pd.DataFrame(iris.data, columns=iris.feature_names)
+        df["target"] = iris.target
+        return df
+    except Exception as e:
+        raise RuntimeError(f"Ошибка при загрузке данных Iris: {e}")
+
+
+def create_interaction_feature(df, feature1, feature2, new_feature_name):
+    """Создает признак-взаимодействие feature1*feature2."""
+    try:
+        if feature1 not in df.columns or feature2 not in df.columns:
+            raise ValueError("Указанных признаков нет в DataFrame")
+        df[new_feature_name] = df[feature1] * df[feature2]
+        return df
+    except Exception as e:
+        raise RuntimeError(f"Ошибка при создании взаимодействия: {e}")
+
+
+def train_model_with_interaction(df, features, target_column="target"):
+    """Обучает модель LogisticRegression с учетом нового признака."""
+    try:
+        X = df[features]
+        y = df[target_column]
+
+        X_train, X_test, y_train, y_test = train_test_split(
+            X, y, test_size=0.3, random_state=42
+        )
+
+        model = LogisticRegression(max_iter=500)
+        model.fit(X_train, y_train)
+
+        y_pred = model.predict(X_test)
+        accuracy = accuracy_score(y_test, y_pred)
+
+        return model, accuracy
+    except Exception as e:
+        raise RuntimeError(f"Ошибка при обучении модели: {e}")
+
+
+def main():
+    # Загружаем данные
+    df = load_iris_data()
+
+    # Создаем взаимодействие между двумя признаками
+    df = create_interaction_feature(
+        df,
+        feature1="sepal length (cm)",
+        feature2="petal length (cm)",
+        new_feature_name="interaction_sepal_petal_length"
+    )
+
+    # Тренируем модель с учетом нового признака
+    features = [
+        "sepal length (cm)",
+        "sepal width (cm)",
+        "petal length (cm)",
+        "petal width (cm)",
+        "interaction_sepal_petal_length" # добавили в модель
+    ]
+
+    print(df.head()) # interaction_sepal_petal_length => признак создан
+    print("Признак создан")
+
+    model, accuracy = train_model_with_interaction(df, features)
+
+    print("Модель обучена")
+    print(f"Точность на тесте: {accuracy:.4f}") # точность: 1.0 => модель не ошиблась ни в одном предсказании
+
+
+if __name__ == "__main__":
+    main()
